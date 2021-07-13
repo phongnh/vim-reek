@@ -72,7 +72,7 @@ endfunction
 if g:reek_on_loading
   augroup reek_plugin
     autocmd!
-    autocmd! BufReadPost,BufWritePost,FileReadPost,FileWritePost *.rb call s:Reek()
+    autocmd BufReadPost,BufWritePost,FileReadPost,FileWritePost *.rb call s:Reek()
   augroup END
 endif
 
