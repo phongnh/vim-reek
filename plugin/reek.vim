@@ -27,12 +27,29 @@ if !exists('g:reek_opts')
     let g:reek_opts = ''
 endif
 
-function! s:Reek()
+if exists('*trim')
+  function! s:Trim(str) abort
+    return trim(a:str)
+  endfunction
+else
+  function! s:Trim(str) abort
+    return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
+  endfunction
+endif
+
+function! s:BuildReekCommand() abort
+  let l:cmd = filter(map([g:reek_cmd, g:reek_opts], 's:Trim(v:val)'), 'strlen(v:val)')
+  return join(l:cmd, ' ')
+endfunction
+
+function! s:Reek() abort
   if exists('g:reek_line_limit') && line('$') > g:reek_line_limit
     return
   endif
 
-  let l:cmd = printf('%s %s %s', g:reek_cmd, g:reek_opts, expand("%:p"))
+  let l:reek_cmd = s:BuildReekCommand()
+  let l:cmd = l:reek_cmd . ' ' . expand("%:p")
+  let s:quickfix_title = s:Trim(l:reek_cmd . ' ' . expand("%:p:."))
 
   let metrics = system(l:cmd)
   let loclist = []
@@ -55,10 +72,11 @@ function! s:Reek()
 endfunction
 
 " Function to run reek and display location list
-function s:RunReek()
+function s:RunReek() abort
   if s:Reek()
     exec has("gui_running") ? "redraw!" : "redraw"
     lopen
+    let w:quickfix_title = s:quickfix_title
   else
     lclose
     echom 'Reek: Passed. Hooray!'
