@@ -2,7 +2,7 @@
 " Author: Rainer Borene <https://github.com/rainerborene>
 " Version: 1.0
 
-if exists('g:loaded_reek') || !executable('reek')
+if exists('g:loaded_reek')
   finish
 endif
 let g:loaded_reek = 1
