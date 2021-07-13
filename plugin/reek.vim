@@ -19,12 +19,22 @@ if !exists('g:reek_on_loading')
   let g:reek_on_loading = 1
 endif
 
+if !exists('g:reek_cmd')
+    let g:reek_cmd = 'reek'
+endif
+
+if !exists('g:reek_opts')
+    let g:reek_opts = ''
+endif
+
 function! s:Reek()
   if exists('g:reek_line_limit') && line('$') > g:reek_line_limit
     return
   endif
 
-  let metrics = system("reek " . expand("%:p"))
+  let l:cmd = printf('%s %s %s', g:reek_cmd, g:reek_opts, expand("%:p"))
+
+  let metrics = system(l:cmd)
   let loclist = []
 
   if g:reek_debug
