@@ -51,28 +51,37 @@ function! s:Reek()
   endfor
 
   call setloclist(0, loclist)
-  if len(loclist) > 0
-    exec has("gui_running") ? "redraw!" : "redraw"
-    if g:reek_always_show
-      " Only show location if we are running reek on loading
-      if g:reek_on_loading
-        ll
-      endif
-    endif
-  endif
+  return len(loclist) > 0
 endfunction
 
 " Function to run reek and display location list
 function s:RunReek()
-  call s:Reek()
-  lopen
+  if s:Reek()
+    exec has("gui_running") ? "redraw!" : "redraw"
+    lopen
+  else
+    lclose
+    echom 'Reek: Passed. Hooray!'
+  endif
 endfunction
 
 " Only set up automatic call if we request reek_on_loading
 if g:reek_on_loading
+  " Function to run reek on loading
+  function! s:ReekOnLoading() abort
+    if s:Reek()
+      exec has("gui_running") ? "redraw!" : "redraw"
+      if g:reek_always_show
+        ll
+      endif
+    else
+      lclose
+    endif
+  endfunction
+
   augroup reek_plugin
     autocmd!
-    autocmd BufReadPost,BufWritePost,FileReadPost,FileWritePost *.rb call s:Reek()
+    autocmd BufReadPost,BufWritePost,FileReadPost,FileWritePost *.rb call s:ReekOnLoading()
   augroup END
 endif
 
