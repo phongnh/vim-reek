@@ -79,7 +79,7 @@ function s:RunReek() abort
     let w:quickfix_title = s:quickfix_title
   else
     lclose
-    echom 'Reek: Passed. Hooray!'
+    echo 'Reek: Passed. Hooray!'
   endif
 endfunction
 
